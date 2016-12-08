@@ -2,8 +2,13 @@
 A python(3) module for GridEYE (AMG88) infrared array sensors.
 
 Because you don't want to deal with i2c, bits and bytes for 256 pixel.
+#Requirements
+- Python3 with Pillow and smbus(2)
+- 1+ AMG88 sensor
 
-usage (on a raspberypi) with python3:
+#Usage 
+(on a raspberypi) with python3:
+
     import smbus2 as smbus
     from gridpy import GridEye
     
@@ -12,6 +17,7 @@ usage (on a raspberypi) with python3:
         sensor_data = eye.get_sensor_data()[0]
 
 or just run
+
     python3 gridpy.py
         
 #Features
