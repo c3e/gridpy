@@ -1,7 +1,10 @@
-import smbus2 as smbus
+try:
+    import smbus2 as smbus
+except (ImportError):
+    import smbus
 from PIL import Image
 
-VERSION = 0.1
+VERSION = 0.15
 AUTHOR = "c. bluoss"
 LICENSE = "MIT License"
 
@@ -9,7 +12,7 @@ LICENSE = "MIT License"
 class GridEye():
 
     """
-    GridEye class for easy handling of GridEye88xx i2c modules.
+    GridEye class for easy handling of GridEYE AMG88 i2c modules.
     Although Grid-EYE%20SPECIFICATIONS(Reference).pdf may still be helpful.
 
     TODO: Interrupts
@@ -140,8 +143,8 @@ class GridEye():
                 upper = block[i+1] << 8
                 lower = block[i]
                 val = upper + lower
-                if 2048 & val is 2048:
-                    val = -val+2048  # not quite sure about the - format
+                if 2048 & val == 2048:
+                    val -= 4096
                 val = val/4
                 if val < minv[0]:
                     minv = [val, i//2, line]
