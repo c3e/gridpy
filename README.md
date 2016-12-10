@@ -23,4 +23,4 @@ or just run
 #Features
 - get/set for all sensor functions(except interrupts and moving average)
 - sensor data as array with temps or (remapped) 8x8 pixel image (using Pillow) including current min/max values.
-    
+- useful functions while handling the AMG88 or other ICs like int2twoscomplement(), split_in_2bytes()
