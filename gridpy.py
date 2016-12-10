@@ -105,6 +105,35 @@ class GridEye():
             value = 0
         self.write_byte(self.i2c["address"], 0x07, value)
 
+    def set_interrupt_limits(self, lower_limit, upper_limit, hysteresis_level):
+        lower_limit = split_in_2bytes(int2twoscomplement(lower_limit))
+        upper_limit = split_in_2bytes(int2twoscomplement(upper_limit))
+        hysteresis_level = split_in_2bytes(int2twoscomplement(hysteresis_level))
+        self.write_byte(self.i2c["address"], 0x08, upper_limit[1])
+        self.write_byte(self.i2c["address"], 0x09, upper_limit[0])
+
+        self.write_byte(self.i2c["address"], 0x0A, lower_limit[1])
+        self.write_byte(self.i2c["address"], 0x0B, lower_limit[0])
+
+        self.write_byte(self.i2c["address"], 0x0C, hysteresis_level[1])
+        self.write_byte(self.i2c["address"], 0x0D, hysteresis_level[0])
+
+    def get_interrupts(self, reset=False):
+        """
+        Returns current interrupts and optionally resets the interrupt table.
+        Format is a list of tuples (line, pixel in line)
+        """
+        interrupts = []
+        data = self.i2c["bus"].read_i2c_block_data(self.i2c["address"], 0x10, 8)
+        for i in range(8):
+            for bit in range(8):
+                if data[i] & 2**bit != 0:
+                    interrupts.append((i, bit))
+
+        if reset:
+            self.clear_states(interrupt=True)
+        return interrupts
+
     def get_thermistor_temp(self, raw=False):
         """
         returns the thermistor temperature in .25°C resolution
@@ -168,6 +197,21 @@ class GridEye():
                     pixel[i, j] = value
             return img, minv, maxv
 
+
+def int2twoscomplement(value, bits=12):
+    """returning a integer which is equal to value as two's complement"""
+    if value > 0:
+        return value
+    else:
+        return (1 << bits) + num
+def split_in_2bytes(value):
+    """
+    Returns a tuple with 2 integers (upper,lower) matching the according bytes
+    The AMG88 usually uses 2 byte to store 12bit values.
+    """
+    upper = value >> 9
+    lower = 0b011111111 & value
+    return (upper, lower)
 
 def maprange(a, b, s):
     """remap values linear to a new range"""
